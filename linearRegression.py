@@ -11,13 +11,23 @@ rBar = np.mean(trStats["ratings"])
 # we get the A matrix from the training dataset
 def getA(training):
     A = np.zeros((trStats["n_ratings"], trStats["n_movies"] + trStats["n_users"]))
-    # ???
+    current_input = 0
+    for i, row in enumerate(training):
+        for j, element in enumerate(row):
+            if element != -1:
+                A[current_input][i] = 1
+                A[current_input][j + 5] = 1
+                current_input += 1
     return A
 
 # we also get c
 def getc(rBar, ratings):
-    # ???
-    return None
+    C = []
+    for row in ratings:
+        for element in row:
+            if element != -1:
+                C.append([element - rBar])
+    return C
 
 # apply the functions
 A = getA(training)
@@ -53,5 +63,5 @@ def predict(movies, users, rBar, b):
 l = 1
 b = param_reg(A, c, l)
 
-print "Linear regression, l = %f" % l
-print lib.rmse(predict(trStats["movies"], trStats["users"], rBar, b), trStats["ratings"])
+print("Linear regression, l = %f" % l)
+print(lib.rmse(predict(trStats["movies"], trStats["users"], rBar, b), trStats["ratings"]))
