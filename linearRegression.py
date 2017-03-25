@@ -35,8 +35,10 @@ c = getc(rBar, trStats["ratings"])
 
 # compute the estimator b
 def param(A, c):
-    # ???
-    return None
+    aa = np.dot(A.T, A) 
+    x = np.dot(A.T,c) 
+    B = np.linalg.solve(aa,x)
+    return B
 
 # compute the estimator b with a regularisation parameter l
 # note: lambda is a Python keyword to define inline functions
