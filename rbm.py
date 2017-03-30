@@ -1,5 +1,6 @@
 import numpy as np
 import projectLib as lib
+import math
 
 # set highest rating
 K = 5
@@ -31,11 +32,14 @@ def getInitialWeights(m, F, K):
     # K is the highest rating (fixed to 5 here)
     return np.random.normal(0, 0.1, (m, F, K))
 
-def sig(x):
+def sig(x): # CHECKED
     ### TO IMPLEMENT ###
     # x is a real vector of size n
     # ret should be a vector of size n where ret_i = sigmoid(x_i)
-    return None
+    ret_i = []
+    for element in x:
+        ret_i.append(1./(1+math.exp(-element)))
+    return np.array(ret_i)
 
 def visibleToHiddenVec(v, w):
     ### TO IMPLEMENT ###
@@ -43,7 +47,18 @@ def visibleToHiddenVec(v, w):
     #    OR a probability distribution over the rating
     # w is a list of matrices of size m x F x 5
     # ret should be a vector of size F
-    return None
+    
+    h = []
+    for j in range(w.shape[1]): 
+        sum_x = 0
+        for i in range(w.shape[0]): 
+            for k in range(5): 
+                x = v[i,k]*w[i,j,k]
+                sum_x += x 
+        h.append(sum_x)
+    h_sig = sig(np.array(h)) 
+    # print(h_sig)
+    return h_sig
 
 def hiddenToVisible(h, w):
     ### TO IMPLEMENT ###
@@ -55,7 +70,29 @@ def hiddenToVisible(h, w):
     #   has not rated! (where reconstructing means getting a distribution
     #   over possible ratings).
     #   We only do so when we predict the rating a user would have given to a movie.
-    return None
+    
+    ### FOR 2-DIMENSIONAL ARRAY... 
+    if w.size<=(h.size*5):
+        w=np.expand_dims(w,axis=0) #increase dimension of w if the size is F X 5
+    
+    v = np.array([[0.0 for i in range(5)] for j in range(w.shape[0])])
+    sum_num = 0 
+    sum_denom = 0 
+    sum_denom_inner = 0 
+    for i in range(w.shape[0]):
+        for k in range(5): 
+            for j in range(w.shape[1]): #check if this works, getting F 
+                sum_denom_inner += h[j]*w[i,j,k]
+            sum_denom += math.exp(sum_denom_inner) 
+            sum_denom_inner = 0 
+        for k in range(5):
+            for j in range(w.shape[1]):
+                sum_num += h[j]*w[i,j,k]
+            v[i,k] = math.exp(sum_num)/sum_denom
+            sum_num = 0 
+        sum_denom = 0 
+    # print(v)
+    return v
 
 def probProduct(v, p):
     # v is a matrix of size m x 5
@@ -91,7 +128,14 @@ def getPredictedDistribution(v, w, wq):
     #   - Backpropagate these hidden states to obtain
     #       the distribution over the movie whose associated weights are wq
     # ret is a vector of size 5
-    return None
+    
+    h = visibleToHiddenVec(v,w) 
+    sample_h = sample(h) 
+    p_dist = hiddenToVisible(sample_h, wq)
+    # print("p_dist is...")
+    # print(p_dist[0])
+    
+    return p_dist[0]
 
 def predictRatingMax(ratingDistribution):
     ### TO IMPLEMENT ###
@@ -100,7 +144,7 @@ def predictRatingMax(ratingDistribution):
     # This function is one of two you are to implement
     # that returns a rating from the distribution
     # We decide here that the predicted rating will be the one with the highest probability
-    return None
+    return (ratingDistribution.index(max(ratingDistribution)))+1
 
 def predictRatingExp(ratingDistribution):
     ### TO IMPLEMENT ###
@@ -109,7 +153,11 @@ def predictRatingExp(ratingDistribution):
     # This function is one of two you are to implement
     # that returns a rating from the distribution
     # We decide here that the predicted rating will be the expectation of the ratingDistribution
-    return None
+    
+    exp_rating = 0 
+    for i in range(len(ratingDistribution)): 
+        exp_rating+= (i+1)*ratingDistribution[i]
+    return exp_rating
 
 def predictMovieForUser(q, user, W, training, predictType="exp"):
     # movie is movie idx
@@ -131,4 +179,18 @@ def predict(movies, users, W, training, predictType="exp"):
 def predictForUser(user, W, training, predictType="exp"):
     ### TO IMPLEMENT
     # given a user ID, predicts all movie ratings for the user
-    return None
+    # print(user,W,training)
+    # return None
+    print(user)
+    return [predictMovieForUser(movie, user, W, training, predictType=predictType) for movie in range(len(W))]
+    
+
+# print(sig(np.array([2,3])))
+# v = np.array([[0,0,0,1,0],[0,0,1,0,0]])
+# #            m1 f1 k--------------k  f2 k---------------k   m2 f1 k-------------k  f2 k---------------k 
+# w = np.array([[[0.1,0.2,0.3,0.4,0.5],[0.6,0.7,0.8,0.9,1.0]],[[1.1,1.2,1.3,1.4,1.5],[1.6,1.7,1.8,1.9,2.0]]])
+# print(visibleToHiddenVec(v,w))
+# # print(sig(np.array([1.7,2.7])))
+# # h = visibleToHiddenVec(v,w)
+# h=np.array([0.5,0.4])
+# print(hiddenToVisible(h,w))

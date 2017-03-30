@@ -12,11 +12,13 @@ vlStats = lib.getUsefulStats(validation)
 
 K = 5
 
-# SET PARAMETERS HERE!!! NOT SET PROPERLY YET
 # number of hidden units
-F = -12343 #rubbish
-epochs =-43242 #rubbish
-gradientLearningRate = -342432 #rubbish
+F = 50 
+
+epochs = 50
+
+# gradient learning rate
+gradientLearningRate = 0.1 
 
 # Initialise all our arrays
 W = rbm.getInitialWeights(trStats["n_movies"], F, K)
@@ -79,4 +81,4 @@ for epoch in range(1, epochs):
 # This part you can write on your own
 # you could plot the evolution of the training and validation RMSEs for example
 predictedRatings = np.array([rbm.predictForUser(user, W, training) for user in trStats["u_users"]])
-np.savetxt("predictedRatings.txt", predictedRatings)
+np.savetxt("team-name_v1.txt", predictedRatings)

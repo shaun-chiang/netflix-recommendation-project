@@ -9,7 +9,6 @@ trStats = lib.getUsefulStats(training)
 rBar = np.mean(trStats["ratings"])
 
 def genR():
-    # TODO
     # We transform the training data into R, like in our homework.
     # We first get the dimensions of the array.
     M=-1
@@ -38,7 +37,7 @@ def getA(R):
                 current_input += 1
     return A
 
-# we also get c
+# we also get c0
 def getc(rBar, ratings):
     C = []
     for element in ratings:
@@ -65,7 +64,6 @@ def param(A, c):
 # note: lambda is a Python keyword to define inline functions
 #       so avoid using it as a variable name!
 def param_reg(A, c, l):
-    #TODO
     aTa = np.dot(A.T, A) 
     aTc = np.dot(A.T,c) 
     B = np.linalg.lstsq(aTa+l*np.identity(A.shape[1]),aTc)
