@@ -18,7 +18,12 @@ F = 50
 epochs = 50
 
 # gradient learning rate
-gradientLearningRate = 0.1 
+gradientLearningRate = 0.1
+
+# gradient intervals, minimum and maximum for momentum
+gradientInterval = 0.05
+minGradient = 0.05
+maxGradient = 0.8
 
 # Initialise all our arrays
 W = rbm.getInitialWeights(trStats["n_movies"], F, K)
@@ -60,6 +65,12 @@ for epoch in range(1, epochs):
 
         # we average over the number of users
         grad = gradientLearningRate * (posprods - negprods) / trStats["n_users"]
+
+        # momentum implementation
+        if grad.mean() >= 0 and gradientLearningRate < maxGradient:
+            gradientLearningRate += gradientInterval
+        elif grad.mean() < 0 and gradientLearningRate > minGradient:
+            gradientLearningRate -= gradientInterval
 
         W += grad
 
