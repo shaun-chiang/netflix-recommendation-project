@@ -21,9 +21,12 @@ epochs = 40
 gradientLearningRate = 0.1
 
 # gradient intervals, minimum and maximum for momentum
-gradientInterval = 0.05
+gradientInterval = 0.01
 minGradient = 0.05
-maxGradient = 0.8
+maxGradient = 0.4
+
+# regularization
+regularizier = 0.5
 
 # Initialise all our arrays
 W = rbm.getInitialWeights(trStats["n_movies"], F, K)
@@ -66,13 +69,16 @@ for epoch in range(1, epochs):
         # we average over the number of users
         grad = gradientLearningRate * (posprods - negprods) / trStats["n_users"]
 
-        # momentum implementation
-        if grad.mean() >= 0 and gradientLearningRate < maxGradient:
-            gradientLearningRate += gradientInterval
-        elif grad.mean() < 0 and gradientLearningRate > minGradient:
-            gradientLearningRate -= gradientInterval
+        W = (1 - regularizier * gradientLearningRate) * W + grad
 
-        W += grad
+        # momentum implementation
+        # if grad.mean() >= 0 and gradientLearningRate < maxGradient:
+        #     gradientLearningRate += gradientInterval
+        # elif grad.mean() < 0 and gradientLearningRate > minGradient:
+        #     gradientLearningRate -= gradientInterval
+
+        if gradientLearningRate < maxGradient:
+            gradientLearningRate += gradientInterval
 
     # Print the current RMSE for training and validation sets
     # this allows you to control for overfitting e.g
