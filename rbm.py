@@ -181,7 +181,7 @@ def predictForUser(user, W, training, predictType="exp"):
     # given a user ID, predicts all movie ratings for the user
     # print(user,W,training)
     # return None
-    print(user)
+    # print(user)
     return [predictMovieForUser(movie, user, W, training, predictType=predictType) for movie in range(len(W))]
     
 

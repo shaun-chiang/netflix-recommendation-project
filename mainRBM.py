@@ -13,9 +13,9 @@ vlStats = lib.getUsefulStats(validation)
 K = 5
 
 # number of hidden units
-F = 50 
+F = 10
 
-epochs = 50
+epochs = 40
 
 # gradient learning rate
 gradientLearningRate = 0.1
